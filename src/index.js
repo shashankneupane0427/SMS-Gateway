@@ -12,9 +12,19 @@ app.use('/auth', authRouter);
 app.use('/sms', auth, smsRouter);
 app.use('/routes', routesRouter);
 
+
 app.get('/wallet', auth, async (req, res) => {
   const wallet = await prisma.wallet.findUnique({ where: { userId: req.userId } });
   res.json({ credits: wallet.credits });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    project: "SMS-Gateway",
+    status: "Online",
+    documentation: "Refer to README.md for API route references"
+  });
 });
 
 async function finishPendingMessages() {
