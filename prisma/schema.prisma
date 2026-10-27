@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  password String
+  wallet   Wallet?
+  messages Message[]
+}
+
+model Wallet {
+  id      Int  @id @default(autoincrement())
+  userId  Int  @unique
+  credits Int
+  user    User @relation(fields: [userId], references: [id])
+}
+
+model Provider {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  priority    Int
+  balance     Int
+  failureRate Float
+  attempts    Attempt[]
+}
+
+model Attempt {
+  id         Int      @id @default(autoincrement())
+  providerId Int
+  success    Boolean
+  createdAt  DateTime @default(now())
+  provider   Provider @relation(fields: [providerId], references: [id])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  recipient String
+  body      String
+  parts     Int
+  status    String   @default("pending")
+  route     String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
